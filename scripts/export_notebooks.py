@@ -35,7 +35,15 @@ for path in paths:
     nb = nbformat.v4.new_notebook(cells=cells)
     nb.metadata.kernelspec = {'display_name': 'Python 3', 'language': 'python', 'name': 'python3'}
     nb.metadata.language_info = {'name': 'python', 'version': '3.12'}
-    nbformat.write(nb, OUT / f'{path.stem}.ipynb')
+    destination = OUT / f'{path.stem}.ipynb'
+    if destination.exists():
+        previous = nbformat.read(destination, as_version=4)
+        executed = {cell.source: cell for cell in previous.cells if cell.cell_type == 'code'}
+        for cell in nb.cells:
+            if cell.cell_type == 'code' and cell.source in executed:
+                cell.outputs = executed[cell.source].outputs
+                cell.execution_count = executed[cell.source].execution_count
+    nbformat.write(nb, destination)
     title = re.search(r'^# (.+?)(?: \{|$)', source, re.M).group(1)
     links.append(f'- [{path.stem[:2]} · {title}](notebooks/{path.stem}.ipynb)')
 lab = ROOT / 'computational-labs.qmd'

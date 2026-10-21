@@ -4,14 +4,24 @@ from urllib.parse import unquote, urlsplit
 import re
 import sys
 from bs4 import BeautifulSoup
+import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT/'_site'
 files = sorted(SITE.glob('*.html'))
 errors = []
 ids = {}
-if not files:
-    errors.append('No HTML pages found: render the HTML book before checking')
+config = yaml.safe_load((ROOT/'_quarto.yml').read_text())
+def chapter_files(entries):
+    for entry in entries:
+        if isinstance(entry,str):
+            yield entry
+        elif isinstance(entry,dict):
+            yield from chapter_files(entry.get('chapters',[]))
+expected = list(chapter_files(config['book']['chapters'])) + config['book'].get('appendices',[])
+for name in expected:
+    if not (SITE/Path(name).with_suffix('.html')).exists():
+        errors.append(f'Missing configured chapter: {name}')
 for path in files:
     soup = BeautifulSoup(path.read_text(), 'html.parser')
     ids[path.resolve()] = {tag['id'] for tag in soup.find_all(id=True)}

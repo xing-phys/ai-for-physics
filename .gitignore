@@ -2,6 +2,12 @@
 .quarto/
 _site/
 _book/
+_freeze/
+/*_files/
+/*.tex
+/*.html
+/index.pdf
+/site_libs/
 __pycache__/
 .ipynb_checkpoints/
 *.log

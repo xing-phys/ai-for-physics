@@ -31,7 +31,7 @@ book:
     collapse-level: 1
   chapters:
     - index.qmd
-    - part: "I · Learning as a physical and statistical problem"
+    - part: "Learning as a physical and statistical problem"
       chapters:
         - 01-physical-questions.qmd
         - 02-mathematical-language.qmd
@@ -39,21 +39,21 @@ book:
         - 04-neural-networks.qmd
         - 05-optimization-and-autodiff.qmd
         - 06-validation-and-uncertainty.qmd
-    - part: "II · Quantum states, matter, and dynamics"
+    - part: "Quantum states, matter, and dynamics"
       chapters:
         - 07-quantum-foundations.qmd
         - 08-neural-quantum-states.qmd
         - 09-variational-monte-carlo.qmd
         - 10-quantum-dynamics.qmd
         - 11-fermions-and-mixed-states.qmd
-    - part: "III · Structure, fields, and simulation"
+    - part: "Structure, fields, and simulation"
       chapters:
         - 12-generative-statistical-physics.qmd
         - 13-symmetry-and-graphs.qmd
         - 14-neural-operators.qmd
         - 15-physics-informed-learning.qmd
         - 16-differentiable-simulation.qmd
-    - part: "IV · Inference, experiments, and discovery"
+    - part: "Inference, experiments, and discovery"
       chapters:
         - 17-inverse-problems.qmd
         - 18-experiment-design.qmd

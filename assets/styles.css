@@ -16,6 +16,7 @@ div.sourceCode { border: 1px solid rgba(100,130,140,.18); }
 .hero { padding: 1.7rem 1.8rem; margin: 1rem 0 1.8rem; border: 1px solid #157a8340; border-radius: .7rem; background: linear-gradient(135deg,#157a8312,#d5a3320c); }
 .hero p { font-size: 1.15rem; line-height: 1.6; }
 .book-kicker { text-transform: uppercase; letter-spacing: .14em; font-size: .74rem!important; font-weight: 700; color: var(--book-accent); }
+.quarto-dark .book-kicker { color: #6fd3d5; }
 .route-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; margin: 1.4rem 0; }
 .route-card { padding: 1rem 1.25rem; border: 1px solid #7a8e963d; border-radius: .5rem; }
 .route-card h3 { margin-top: 0; font-size: 1.15rem; }

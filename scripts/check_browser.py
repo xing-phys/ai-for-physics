@@ -39,6 +39,12 @@ with sync_playwright() as p:
     xref.click()
     assert '04-neural-networks' in page.url
     page.goto(args.base_url+'index.html', wait_until='networkidle')
+    search = page.locator('#quarto-search input')
+    search.fill('stochastic reconfiguration')
+    page.wait_for_selector('.aa-Item')
+    assert page.locator('.aa-Item').count() > 0
+    page.keyboard.press('Escape')
+    page.screenshot(path=str(OUT/'search.png'))
     toggle = page.locator('.quarto-color-scheme-toggle').first
     if toggle.count():
         toggle.click()
