@@ -1,0 +1,120 @@
+project:
+  type: book
+  output-dir: _site
+  resources:
+    - notebooks/
+    - requirements.txt
+    - requirements-lock.txt
+    - LICENSE-CONTENT
+    - LICENSE-CODE
+    - research/
+    - figs/
+
+book:
+  title: "AI for Physics"
+  subtitle: "From Fundamental Methods to Scientific Discovery"
+  author:
+    - name: Ze-Yu Xing
+      orcid: 0009-0009-5655-0187
+      affiliations:
+        - Institute of Physics, Chinese Academy of Sciences
+        - University of Chinese Academy of Sciences
+  date: "2026-10-21"
+  date-format: long
+  site-url: https://xing-phys.github.io/ai-for-physics/
+  repo-url: https://github.com/xing-phys/ai-for-physics
+  repo-actions: [edit, issue, source]
+  search: true
+  downloads: [pdf]
+  sidebar:
+    style: docked
+    collapse-level: 1
+  chapters:
+    - index.qmd
+    - part: "I · Learning as a physical and statistical problem"
+      chapters:
+        - 01-physical-questions.qmd
+        - 02-mathematical-language.qmd
+        - 03-learning-from-data.qmd
+        - 04-neural-networks.qmd
+        - 05-optimization-and-autodiff.qmd
+        - 06-validation-and-uncertainty.qmd
+    - part: "II · Quantum states, matter, and dynamics"
+      chapters:
+        - 07-quantum-foundations.qmd
+        - 08-neural-quantum-states.qmd
+        - 09-variational-monte-carlo.qmd
+        - 10-quantum-dynamics.qmd
+        - 11-fermions-and-mixed-states.qmd
+    - part: "III · Structure, fields, and simulation"
+      chapters:
+        - 12-generative-statistical-physics.qmd
+        - 13-symmetry-and-graphs.qmd
+        - 14-neural-operators.qmd
+        - 15-physics-informed-learning.qmd
+        - 16-differentiable-simulation.qmd
+    - part: "IV · Inference, experiments, and discovery"
+      chapters:
+        - 17-inverse-problems.qmd
+        - 18-experiment-design.qmd
+        - 19-discovery-and-symbolic.qmd
+        - 20-frontiers-and-research.qmd
+        - 21-projects-and-solutions.qmd
+    - references.qmd
+  appendices:
+    - notation.qmd
+    - computational-labs.qmd
+    - literature-and-reproducibility.qmd
+  page-footer:
+    left: "AI for Physics · An open computational textbook"
+    right: "Text & figures: CC BY 4.0 · Code: MIT"
+
+bibliography:
+  - assets/foundations.bib
+  - assets/quantum.bib
+  - assets/physical-models.bib
+  - assets/discovery.bib
+csl: assets/american-physics-society.csl
+link-citations: true
+lang: en
+jupyter: python3
+execute:
+  freeze: auto
+  error: false
+  warning: false
+  cache: false
+  timeout: 180
+  daemon: false
+
+format:
+  html:
+    theme:
+      light: [cosmo, assets/theme-light.scss]
+      dark: [darkly, assets/theme-dark.scss]
+    css: assets/styles.css
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-copy: true
+    code-fold: false
+    code-overflow: wrap
+    fig-responsive: true
+    html-math-method: mathjax
+    include-in-header: assets/mathjax-config.html
+    reference-location: margin
+    smooth-scroll: true
+  pdf:
+    output-file: AI-for-Physics.pdf
+    documentclass: scrreprt
+    pdf-engine: lualatex
+    papersize: a4
+    geometry: [margin=25mm]
+    fontsize: 10pt
+    colorlinks: true
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    include-in-header: assets/macros.sty
+    keep-tex: false
+    reference-location: document
+    code-overflow: wrap

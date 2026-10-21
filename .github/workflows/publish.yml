@@ -1,0 +1,64 @@
+name: Build and publish textbook
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: '1.10.18'
+          tinytex: true
+      - name: Install numerical and checking environment
+        run: pip install -r requirements-lock.txt
+      - name: Figures, sources, and clean-kernel notebook checks
+        run: |
+          python scripts/make_figures.py
+          python scripts/export_notebooks.py
+          python scripts/check_sources.py
+          python scripts/check_examples.py
+      - name: Render combined PDF and web textbook
+        run: |
+          quarto render --to pdf
+          quarto render --to html --no-clean
+          python scripts/check_site.py
+          touch _site/.nojekyll
+      - name: Configure Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        if: github.event_name != 'pull_request'
+        with:
+          path: _site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy textbook
+        id: deployment
+        uses: actions/deploy-pages@v4

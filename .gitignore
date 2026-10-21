@@ -1,0 +1,16 @@
+.venv/
+.quarto/
+_site/
+_book/
+__pycache__/
+.ipynb_checkpoints/
+*.log
+*.aux
+*.toc
+*.out
+.DS_Store
+artifacts/
+playwright-report/
+
+/.quarto/
+**/*.quarto_ipynb
