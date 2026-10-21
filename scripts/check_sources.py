@@ -9,10 +9,12 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 config = yaml.safe_load((ROOT / '_quarto.yml').read_text())
 keys = []
+dois = []
 errors = []
 for name in config['bibliography']:
     entries = bibtexparser.loads((ROOT/name).read_text()).entries
     keys.extend(e['ID'] for e in entries)
+    dois.extend(e['doi'].lower() for e in entries if e.get('doi'))
     for entry in entries:
         for field in ['title', 'author', 'year']:
             if not entry.get(field):
@@ -34,6 +36,9 @@ for path in ROOT.glob('*.qmd'):
 for key, count in Counter(keys).items():
     if count > 1:
         errors.append(f'Duplicate bibliography key: {key}')
+for doi, count in Counter(dois).items():
+    if count > 1:
+        errors.append(f'Duplicate DOI record: {doi}')
 for key, count in Counter(labels).items():
     if count > 1:
         errors.append(f'Duplicate label: {key}')
