@@ -1,0 +1,97 @@
+# Computational laboratories {#sec-labs}
+
+## Running and downloading the examples
+
+Every numbered chapter has a downloadable Jupyter notebook containing its teaching text and Python cells. The typeset chapter remains the authoritative location for numbered cross-references and bibliography formatting. The notebook is a working document for executing, editing, and extending the calculations. The [repository](https://github.com/xing-phys/ai-for-physics) contains both sources and generated notebooks.
+
+<!-- NOTEBOOK-LIST -->
+
+- [01 · What can learning contribute to physics?](notebooks/01-physical-questions.ipynb)
+- [02 · Probability, geometry, and numerical reasoning](notebooks/02-mathematical-language.ipynb)
+- [03 · Learning from measurements and configurations](notebooks/03-learning-from-data.ipynb)
+- [04 · Neural networks as adaptable physical representations](notebooks/04-neural-networks.ipynb)
+- [05 · Optimization and automatic differentiation](notebooks/05-optimization-and-autodiff.ipynb)
+- [06 · What makes a learned result trustworthy?](notebooks/06-validation-and-uncertainty.ipynb)
+- [07 · Why quantum many-body physics needs new representations](notebooks/07-quantum-foundations.ipynb)
+- [08 · Neural quantum states: learning amplitudes, signs, and correlations](notebooks/08-neural-quantum-states.ipynb)
+- [09 · Variational Monte Carlo: turning a wavefunction into a scientific calculation](notebooks/09-variational-monte-carlo.ipynb)
+- [10 · Learning quantum dynamics without losing the physics](notebooks/10-quantum-dynamics.ipynb)
+- [11 · Fermions, density matrices, and learning from quantum experiments](notebooks/11-fermions-and-mixed-states.ipynb)
+- [12 · Generative models and statistical physics](notebooks/12-generative-statistical-physics.ipynb)
+- [13 · Symmetry, geometry, and graph networks](notebooks/13-symmetry-and-graphs.ipynb)
+- [14 · Learning maps between physical fields](notebooks/14-neural-operators.ipynb)
+- [15 · Learning with differential equations](notebooks/15-physics-informed-learning.ipynb)
+- [16 · Differentiable simulation and learned mechanics](notebooks/16-differentiable-simulation.ipynb)
+- [17 · What can measurements tell us? Inverse problems](notebooks/17-inverse-problems.ipynb)
+- [18 · Which experiment should we perform next?](notebooks/18-experiment-design.ipynb)
+- [19 · Can an algorithm discover a physical law?](notebooks/19-discovery-and-symbolic.ipynb)
+- [20 · From accurate predictions to scientific progress](notebooks/20-frontiers-and-research.ipynb)
+- [21 · Research projects, reproducibility, and worked solutions](notebooks/21-projects-and-solutions.ipynb)
+
+<!-- /NOTEBOOK-LIST -->
+
+All numerical demonstrations use NumPy and, for plots, Matplotlib. No GPU, paid service, external dataset, pretrained model, or machine-learning framework is required. Data are generated from formulas or small simulators included in the cells. Larger research implementations linked in chapters have separate environments and are not required to reproduce this book.
+
+From a terminal in a downloaded copy of the repository:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python scripts/export_notebooks.py
+python scripts/check_examples.py
+jupyter lab
+```
+
+`requirements-lock.txt` records the full package versions used for this edition. The shorter requirements file specifies compatible ranges for ordinary use. Exact versions improve reproducibility on a compatible platform; numerical library and operating-system changes can still alter floating-point last digits.
+
+To build the website with [Quarto](https://quarto.org/docs/get-started/), use:
+
+```bash
+source .venv/bin/activate
+export QUARTO_PYTHON="$PWD/.venv/bin/python"
+python scripts/make_figures.py
+quarto render --to html --no-clean
+python scripts/check_site.py
+quarto preview --no-browser
+```
+
+To build the combined PDF, a working LuaLaTeX installation is required:
+
+```bash
+quarto render --to pdf
+```
+
+The build executes Python cells, stops on errors, and generates the chapter figures. Quarto's freeze cache avoids repeating unchanged computations during whole-project builds; `quarto render --execute` forces reexecution. `scripts/check_examples.py` executes exported notebooks independently of that cache. The source and site checks test citations, references, local destinations, and anchors; browser checks separately inspect actual rendered mathematics and navigation.
+
+## A minimal Python and NumPy introduction
+
+Python uses indentation to group statements. `x = 2.0` assigns a number, `x**2` squares it, and `#` begins a comment. A `for` loop repeats a block, and `def` defines a function. `return` passes a function's result back to its caller. Imports make another package's names available. `import numpy as np` uses the short prefix `np` for numerical functions.
+
+```{python}
+import numpy as np
+def harmonic_energy(x, k=2.0):
+    return 0.5*k*x**2
+positions = np.array([-1.0, 0.0, 1.0])
+energies = harmonic_energy(positions)
+assert np.allclose(energies, [1.0, 0.0, 1.0])
+print(energies)
+```
+
+A NumPy array stores numbers with a shape. A vector can have shape `(n,)`; a matrix has shape `(n, m)`. Array indexing starts at zero. `a[i]` selects one entry, `a[:, j]` one column, and `a[None, :]` inserts a length-one axis. Elementwise arithmetic applies to every entry: `a*b` multiplies corresponding entries, while `A @ x` performs matrix multiplication. `np.sum`, `np.mean`, and `np.std` compute sums, means, and standard deviations; an `axis` argument specifies which index is summed away.
+
+**Broadcasting** allows compatible shapes to act together. If `x` has shape `(n, 1)` and `w` has shape `(m,)`, `x*w` has shape `(n, m)` with entry $x_iw_a$. This is why one network cell evaluates many examples and hidden units without writing a nested loop. Check shapes whenever a result seems plausible but wrong: broadcasting can sometimes perform an unintended operation without an error.
+
+`np.linalg.eigh` diagonalizes Hermitian or real symmetric matrices, returning eigenvalues in ascending order and eigenvectors as columns. `np.linalg.lstsq` solves a least-squares problem. `np.linalg.solve(A,b)` solves a square linear system; it should generally replace explicit inversion when only $A^{-1}b$ is needed. `np.vdot(a,b)` conjugates its first argument, which matters for quantum amplitudes. Ordinary `@` between complex arrays does not conjugate automatically.
+
+Use `rng = np.random.default_rng(seed)` to create a random-number generator. A recorded seed makes a particular pseudorandom experiment reproducible; repeating many seeds tests variability rather than merely reproducing one outcome. `assert condition` stops execution if an expected property fails. Assertions in the book check meaningful analytic identities, bounds, normalization, or reconstruction accuracy. They are limited to the stated examples.
+
+For plots, `plt.plot(x,y)` draws a curve, labels state the physical quantity and units, and `plt.show()` displays the figure. Every notebook should be runnable from a fresh kernel, from top to bottom. Hidden state from an earlier interactive session can otherwise conceal a missing definition or dependency.
+
+## A sound numerical experiment
+
+Before running, write down an analytic limit, expected sign, characteristic scale, and conservation or symmetry check. Use a small system for which an independent calculation is available. Change sample size or time step and inspect convergence. Distinguish random fluctuations from systematic errors by repeating the run and varying numerical resolution separately.
+
+The examples deliberately emphasize readable implementations over maximum speed. Exact enumeration of a small spin system is a calibration tool; its exponential cost prevents direct scaling. A random-feature PDE model isolates constraint fitting; it is not claimed to reproduce a fully trained frontier network. A one-dimensional flow illustrates a Jacobian identity; it does not establish rapid mixing for a gauge theory.
+
+For an independent project, keep generated data, model parameters, and evaluation scripts separate; record the physical data-generation rules; save the training/test split by independent unit; retain a simple baseline; and create one command that reproduces the final figure and its uncertainty. Chapter 21 provides complete project specifications and selected solution paths.

@@ -1,0 +1,273 @@
+# Fermions, density matrices, and learning from quantum experiments {#sec-quantum-fermions-mixed}
+
+Two additional physical requirements reshape neural quantum models. Electrons are identical fermions, so exchanging their complete labels must reverse the wavefunction's sign. Open systems exchange information and energy with an environment, so one wavefunction no longer describes all accessible observations. These requirements are not small corrections to a generic network. They determine the mathematical object that should be represented and which constraints must hold exactly.
+
+We first build antisymmetric electronic wavefunctions from determinants and configuration-dependent orbitals. We then introduce density matrices, positivity-preserving parametrizations, dissipative dynamics, and tomography. The unifying question is how to incorporate physical validity while retaining expressive models and tractable computation.
+
+::: {.callout-note title="Learning goals and prerequisites"}
+Read [Quantum foundations](07-quantum-foundations.qmd) for tensor products and reduced density matrices, [VMC](09-variational-monte-carlo.qmd) for energy optimization, and [Dynamics](10-quantum-dynamics.qmd) for variational projection. We define determinants, occupation-number signs, density-matrix positivity, and generalized measurements here. By the end you should be able to verify fermionic exchange symmetry, derive a continuum local energy, construct a physical density matrix, solve an amplitude-damping example, and explain what measurement data can identify.
+:::
+
+## Exchange statistics is a constraint on amplitudes {#sec-quantum-fermion-exchange}
+
+For identical fermions, exchange of any two complete one-particle coordinates $x_i=(\mathbf r_i,\sigma_i)$ obeys
+
+$$
+\psi(\ldots,x_i,\ldots,x_j,\ldots)
+=-\psi(\ldots,x_j,\ldots,x_i,\ldots).
+$$ {#eq-quantum-antisymmetry}
+
+The spin label is included: electrons with opposite spin projections are still identical particles. In a calculation with fixed numbers of up- and down-spin electrons, one commonly works with a spatial amplitude antisymmetric separately within each spin group. Combining it with the corresponding antisymmetrized spin sector recovers the complete fermionic state. This convention explains why electronic-structure ansätze often contain one determinant for each spin group.
+
+For $N$ one-particle orbitals $\phi_a(x)$, define a matrix $M_{ia}=\phi_a(x_i)$. Its determinant is
+
+$$
+\det M=\sum_{\pi\in S_N}\operatorname{sgn}(\pi)
+\prod_{i=1}^N M_{i,\pi(i)},
+$$
+
+where the sum runs over all permutations of orbital assignments and the sign changes for each pair exchange. Exchanging particles swaps two rows, multiplying the determinant by $-1$. Thus
+
+$$
+\psi_{\mathrm{Slater}}(x_1,\ldots,x_N)=\frac1{\sqrt{N!}}\det[\phi_a(x_i)]
+$$
+
+is a normalized Slater determinant when the occupied orbitals are orthonormal. For general learned orbitals or a sum of determinants, normalization is not supplied by that prefactor; VMC uses the Rayleigh quotient. A determinant can be evaluated by matrix factorization in order $N^3$ operations, rather than explicitly summing $N!$ terms.
+
+If two fermions have identical complete coordinates, two rows coincide and the amplitude vanishes. More generally, the zero set is called the *nodal set* for a real state. Its geometry influences kinetic energy and correlations. A positive multiplicative factor can change amplitudes but cannot move these nodes. This is why an expressive positive correlation factor on top of a poor determinant may remain inadequate.
+
+### Worked example: two spin-polarized fermions in a harmonic trap
+
+Use one-dimensional oscillator units $\hbar=m=\omega=1$. The lowest orbitals are $\phi_0(x)=\pi^{-1/4}e^{-x^2/2}$ and $\phi_1(x)=\sqrt2x\phi_0(x)$, with energies $1/2$ and $3/2$. The antisymmetric ground state is
+
+$$
+\psi(x_1,x_2)=\frac{\phi_0(x_1)\phi_1(x_2)-\phi_1(x_1)\phi_0(x_2)}{\sqrt2}
+=(x_2-x_1)\phi_0(x_1)\phi_0(x_2).
+$$
+
+The energy is $2$. Two distinguishable noninteracting particles could both occupy $\phi_0$ and have total energy $1$; exchange statistics prevents this for the spin-polarized fermions. The node $x_1=x_2$ is explicit. The probability density has a correlation hole around coincidence even though the Hamiltonian has no interparticle potential. This is a concrete physical effect of antisymmetry, rather than a learned interaction.
+
+## Occupation-number signs on a lattice {#sec-quantum-fermion-lattice}
+
+For lattice models it is convenient to label a basis by occupations $n_a\in\{0,1\}$ of a fixed ordering of spin orbitals. Define
+
+$$
+|n_1,\ldots,n_L\rangle=(c_1^\dagger)^{n_1}\cdots(c_L^\dagger)^{n_L}|\mathrm{vac}\rangle.
+$$
+
+Fermionic creation and annihilation operators obey $c_ac_b^\dagger+c_b^\dagger c_a=\delta_{ab}$ and $c_ac_b+c_bc_a=0$. To annihilate a particle in orbital $a$, move $c_a$ past all earlier occupied creation operators. Each interchange gives a minus sign, so
+
+$$
+c_a|n\rangle=(-1)^{\sum_{b<a}n_b}n_a
+|n_1,\ldots,n_a-1,\ldots,n_L\rangle.
+$$
+
+Creation has the same parity factor and an additional factor $1-n_a$. A hopping matrix element $c_a^\dagger c_b$ therefore carries a parity sign determined by the ordering and intervening occupations. These signs belong in the Hamiltonian connectivity used by the local-energy estimator. A positive network over occupation configurations does not remove them.
+
+The Hubbard model makes the physical competition clear:
+
+$$
+H=-t\sum_{\langle ij\rangle,\sigma}(c_{i\sigma}^\dagger c_{j\sigma}+c_{j\sigma}^\dagger c_{i\sigma})
++U\sum_i n_{i\uparrow}n_{i\downarrow}.
+$$
+
+Hopping favors delocalization, while $U>0$ penalizes double occupancy. At large $U/t$, virtual hopping can generate antiferromagnetic exchange; away from half filling, competing orders and sign structure make reliable calculations difficult. A neural result on one finite doped cluster is not a solution of every Hubbard-model regime. Boundary conditions, filling, spin sector, and competing stripe or pairing tendencies must be specified.
+
+## Correlation factors, backflow, and equivariant orbitals {#sec-quantum-backflow}
+
+A Slater–Jastrow state multiplies a determinant by $e^{J_\theta(R)}$, where $R=(\mathbf r_1,\ldots,\mathbf r_N)$ and $J_\theta$ is symmetric under exchanges within the relevant spin groups. The product remains antisymmetric. A neural symmetric function may be built from sums over particles and pairs, as in permutation-invariant graph models. For real $J$, the factor is positive and leaves the determinant nodes fixed.
+
+Backflow changes the orbitals themselves. A simple coordinate transformation is
+
+$$
+\mathbf q_i=\mathbf r_i+\sum_{j\ne i}\eta_\theta(r_{ij})(\mathbf r_i-\mathbf r_j),
+\qquad r_{ij}=|\mathbf r_i-\mathbf r_j|,
+$$
+
+followed by $\det[\phi_a(\mathbf q_i)]$. If two particles are exchanged, the transformed coordinates exchange in the same way, so rows still swap. The orbitals now depend on the entire configuration, allowing correlated changes of the nodal surface in appropriate dimensions. More general neural backflow directly predicts corrections to the orbital matrix.
+
+The essential condition is *equivariance*: a permutation of input particle labels must produce the corresponding permutation of the output rows. Consider features $h_i$ updated by
+
+$$
+h_i'=F_\theta\left(h_i,\sum_jG_\theta(h_i,h_j,\mathbf r_i-\mathbf r_j)\right).
+$$
+
+The sum does not depend on the ordering of the other particles. Relabeling inputs therefore relabels the $h_i'$ outputs. Applying the same orbital-output function to each row preserves this property. A determinant of the resulting matrix is antisymmetric by construction. An unrestricted network producing a matrix without this equivariance does not obtain the guarantee merely because a determinant is placed at the end.
+
+FermiNet uses configuration-dependent orbitals generated from one- and two-electron information and combines determinants [@q-pfau2020]. PauliNet builds in an electronic-structure baseline together with learned correlation and backflow, including short-distance physical constraints [@q-hermann2020]. Both optimize wavefunctions variationally; their design choices differ in how much analytical electronic structure is supplied in advance. Neural backflow also has a lattice formulation that directly improves a mean-field reference [@q-luo2019]. These are complementary ways to allocate learning capacity to the correlations that the reference misses.
+
+## Continuum local energy and short-distance physics {#sec-quantum-continuum-local-energy}
+
+In the Born–Oppenheimer approximation, nuclei are held fixed at positions $\mathbf R_A$ while electrons move. In atomic units, $\hbar=m_e=e^2/(4\pi\epsilon_0)=1$, the electronic Hamiltonian is
+
+$$
+H=-\frac12\sum_i\nabla_i^2
+-\sum_{iA}\frac{Z_A}{|\mathbf r_i-\mathbf R_A|}
++\sum_{i<j}\frac1{r_{ij}}+E_{\mathrm{NN}}.
+$$ {#eq-quantum-electronic-hamiltonian}
+
+The last term is the constant nuclear repulsion. Nuclear motion, relativistic corrections, and environmental effects are omitted; a very accurate solution of this Hamiltonian does not remove those modeling approximations.
+
+Away from nodes, let $f(R)=\log\widetilde\psi(R)$ on a locally consistent complex branch. Differentiating $\psi=e^f$ gives $\nabla\psi=\psi\nabla f$ and
+
+$$
+\frac{\nabla_i^2\psi}{\psi}=\nabla_i^2f+(\nabla_if)\cdot(\nabla_if).
+$$
+
+Consequently
+
+$$
+E_{\mathrm{loc}}(R)=-\frac12\sum_i
+\left[\nabla_i^2f+(\nabla_if)\cdot(\nabla_if)\right]+V(R).
+$$ {#eq-quantum-continuum-energy}
+
+For a complex $f$, this dot product does **not** conjugate either factor; replacing it by $|\nabla f|^2$ changes the Schrödinger operator. For a real wavefunction within a nodal region one can use $\log|\psi|$, retaining the sign separately. Automatic differentiation supplies coordinate derivatives, but second derivatives over many electrons can dominate computational cost.
+
+Coulomb singularities suggest exact short-distance constraints. Near one nucleus, ignore nonsingular terms and take the spherical average of a nonzero electronic amplitude as $\psi(r)=\psi(0)(1+ar+O(r^2))$. Since $\nabla^2r=2/r$, the singular kinetic contribution divided by $\psi$ is $-a/r$. The nuclear potential contributes $-Z/r$. Cancellation requires $a=-Z$, or $\partial_r\log\psi|_{0}=-Z$. This is the electron–nucleus cusp condition under the stated assumptions. Enforcing it prevents the network from spending its capacity approximating a known singular behavior.
+
+For two opposite-spin electrons, the relative-coordinate kinetic operator is $-\nabla_r^2$ in these units, because their reduced mass is $1/2$. With $\psi\sim1+ar$, cancellation of $-2a/r+1/r$ gives $a=1/2$. Parallel-spin coincidence has a leading antisymmetric angular factor and a different cusp coefficient. The important principle is to derive constraints in the correct relative coordinate and symmetry channel rather than copying a coefficient without its assumptions.
+
+## Mixed states: uncertainty that a wavefunction cannot encode {#sec-quantum-density-matrices}
+
+Suppose a spin is prepared as $|\uparrow\rangle$ half the time and $|\downarrow\rangle$ half the time. Its density matrix is $\rho=I/2$. This is not the same as the pure superposition $|+x\rangle$: the latter has off-diagonal coherence and unit $x$ polarization. More generally an ensemble has
+
+$$
+\rho=\sum_a w_a|\psi_a\rangle\langle\psi_a|,
+\qquad w_a\geq0,\quad\sum_aw_a=1,
+$$
+
+and predicts $\langle A\rangle=\operatorname{Tr}(\rho A)$. A physical density matrix is Hermitian, has unit trace, and is positive semidefinite: $v^\dagger\rho v\geq0$ for every $v$. Positivity guarantees nonnegative probabilities for projective measurements. These conditions are equivalent to nonnegative eigenvalues summing to one. A pure state's density matrix has rank one and $\operatorname{Tr}\rho^2=1$; mixed states have smaller purity.
+
+For a qubit, write
+
+$$
+\rho=\frac12(I+\mathbf r\cdot\boldsymbol\sigma).
+$$
+
+Using $(\mathbf r\cdot\boldsymbol\sigma)^2=|\mathbf r|^2I$, its eigenvalues are $(1\pm|\mathbf r|)/2$. Thus $|\mathbf r|\leq1$ is exactly the positivity condition. The unit ball is the Bloch ball; its surface consists of pure states. An unconstrained network predicting three expectation values can output $|\mathbf r|>1$, which has no physical interpretation as a state.
+
+One positivity-preserving construction is
+
+$$
+\rho_\theta=\frac{A_\theta A_\theta^\dagger}{\operatorname{Tr}(A_\theta A_\theta^\dagger)}.
+$$ {#eq-quantum-positive-density}
+
+Hermiticity is immediate. Also $v^\dagger AA^\dagger v=\|A^\dagger v\|^2\geq0$, proving positivity when $A\ne0$ so the denominator is nonzero. For a positive-definite small matrix, a lower-triangular factor with real positive diagonal fixes the unitary factor ambiguity; this is the Cholesky convention. An overall scale still cancels in the trace normalization. For many-body systems, storing a full factor remains exponential. A factor with $r$ columns has rank at most $r$, so a low-rank assumption is a physical approximation that may fail at high temperature or under strong mixing.
+
+## Purification and thermal states {#sec-quantum-purification}
+
+Introduce an auxiliary system with basis $|a\rangle$ and a pure state $|\Psi_\theta\rangle=\sum_{s,a}\Psi_\theta(s,a)|s\rangle|a\rangle$. Tracing out the auxiliary gives
+
+$$
+\rho_\theta(s,s')=\sum_a\Psi_\theta(s,a)\Psi_\theta(s',a)^*.
+$$ {#eq-quantum-purification}
+
+This has the form $AA^\dagger$ and is positive. If the joint state is normalized, its trace is one. Every finite-dimensional density matrix admits a purification: diagonalize $\rho=\sum_a\lambda_a|a\rangle\langle a|$ and use $\sum_a\sqrt{\lambda_a}|a\rangle|a\rangle$. The auxiliary dimension must be at least the rank. Different unitaries on the auxiliary produce the same physical density matrix, introducing gauge redundancy.
+
+For a system of dimension $d$, start from the unnormalized maximally entangled state $|I\rangle=\sum_s|s\rangle|s\rangle$. Apply imaginary time only to the physical system:
+
+$$
+|\Psi_\beta\rangle=(e^{-\beta H/2}\otimes I)|I\rangle.
+$$
+
+Its physical reduced matrix is $e^{-\beta H/2}Ie^{-\beta H/2}=e^{-\beta H}$. Normalizing by its trace yields the Gibbs state. Here $\beta=1/(k_BT)$, so the imaginary-time length in physical units is $\hbar\beta/2$. This explains the factor one-half in thermal purification. Approximating the purified evolution introduces variational bias; positivity alone does not prove the resulting state has the correct temperature or free energy.
+
+An alternative vectorizes $\rho$ as a vector in a doubled Hilbert space and applies variational methods directly. This makes linear evolution convenient, but an arbitrary doubled vector does not necessarily correspond to a positive, Hermitian, unit-trace matrix. Positivity and efficient evolution can pull architecture design in different directions.
+
+## Dissipation and the Lindblad equation {#sec-quantum-lindblad}
+
+A continuous semigroup of completely positive, trace-preserving maps in finite dimension has a generator of Lindblad form [@q-lindblad1976]. The semigroup composition law $\mathcal E_{t+s}=\mathcal E_t\mathcal E_s$ expresses time-homogeneous memoryless evolution; complete positivity is the additional physical condition explained below. We use
+
+$$
+\dot\rho=-\frac{i}{\hbar}[H,\rho]
++\sum_\mu\gamma_\mu\left(L_\mu\rho L_\mu^\dagger
+-\frac12\{L_\mu^\dagger L_\mu,\rho\}\right),\quad\gamma_\mu\geq0.
+$$ {#eq-quantum-lindblad}
+
+Here $\{A,B\}=AB+BA$, and $L_\mu$ is a dimensionless jump operator when $\gamma_\mu$ carries inverse-time units. One can instead absorb $\sqrt{\gamma_\mu}$ into $L_\mu$; mixing these conventions double counts the rate. Complete positivity means the map remains positivity preserving when an arbitrary untouched auxiliary system is included. The Lindblad structure ensures this property for the exact evolution. It is not a universal model for every system–environment coupling: memory effects or an inappropriate coarse graining can invalidate the Markovian description.
+
+Trace preservation follows by cyclicity: $\operatorname{Tr}(L\rho L^\dagger)=\operatorname{Tr}(L^\dagger L\rho)$, canceling the two half terms. Hermiticity is also preserved. A variational or discretized approximate evolution must check these properties separately; even forward Euler applied to a valid generator need not preserve positivity at arbitrary step sizes.
+
+For a decaying two-level atom, choose $H=0$, $L=|g\rangle\langle e|$ and rate $\gamma$. Then $L^\dagger L=|e\rangle\langle e|$. Evaluating matrix elements gives
+
+$$
+\dot\rho_{ee}=-\gamma\rho_{ee},\quad
+\dot\rho_{gg}=\gamma\rho_{ee},\quad
+\dot\rho_{ge}=-\frac\gamma2\rho_{ge}.
+$$
+
+The solutions are $\rho_{ee}(t)=\rho_{ee}(0)e^{-\gamma t}$, $\rho_{gg}(t)=1-\rho_{ee}(t)$, and $\rho_{ge}(t)=\rho_{ge}(0)e^{-\gamma t/2}$. Coherence decays at half the population-decay rate in this idealized channel. An initially excited atom becomes mixed at intermediate times and eventually reaches the pure ground state; purity need not decrease monotonically in an open system.
+
+For an initial excited state, the Euler update would give $\rho_{ee}=1-\gamma\delta t$ and $\rho_{gg}=\gamma\delta t$. If $\gamma\delta t>1$, it produces a negative eigenvalue. Exact trace preservation does not rescue positivity. This simple test should precede any large neural open-system calculation.
+
+## Learning a state from measurement data {#sec-quantum-tomography}
+
+In tomography, the Hamiltonian may not specify the state. We observe repeated outcomes. A positive operator-valued measure (POVM) is a set of positive operators $M_a$ with $\sum_aM_a=I$. Born probabilities are $p(a)=\operatorname{Tr}(\rho M_a)$. For a known measurement setting $b$, use $p_\theta(a\mid b)=\operatorname{Tr}(\rho_\theta M_a^{(b)})$. Given independent observed pairs $(a_m,b_m)$, maximum likelihood minimizes
+
+$$
+\mathcal L(\theta)=-\frac1M\sum_{m=1}^M\log p_\theta(a_m\mid b_m).
+$$ {#eq-quantum-tomography-loss}
+
+The measurement settings are part of the data model. Fitting only $z$-basis frequencies cannot identify qubit $x$ and $y$ coherences, as the Bell examples already showed. An informationally complete measurement spans the operator space, making the density matrix identifiable with ideal exact probabilities. Finite data, calibration error, and an imperfect ansatz still produce uncertainty.
+
+For a qubit, a symmetric four-outcome POVM uses tetrahedral unit vectors $\mathbf n_a$ with $\sum_a\mathbf n_a=0$ and $\sum_a\mathbf n_a\mathbf n_a^T=(4/3)I$. Set $M_a=(I+\mathbf n_a\cdot\boldsymbol\sigma)/4$. Each has eigenvalues $0,1/2$, so it is positive, and the sum is $I$. For a Bloch vector $\mathbf r$,
+
+$$
+p_a=\frac{1+\mathbf n_a\cdot\mathbf r}{4},\qquad
+\mathbf r=3\sum_ap_a\mathbf n_a.
+$$ {#eq-quantum-povm-reconstruction}
+
+The inverse follows by substituting $p_a$ and using the two tetrahedral identities. Notice a crucial constraint: not every four-outcome probability distribution maps to a physical density matrix. If $p_1=1$ and all others vanish, the reconstructed $\mathbf r=3\mathbf n_1$ has length three and a negative density-matrix eigenvalue. A normalized positive probability model in POVM space is therefore not automatically a positivity-preserving quantum-state model.
+
+```{python}
+#| label: quantum-density-laboratory
+import numpy as np
+tetrahedron = np.array([[1,1,1], [1,-1,-1],
+                        [-1,1,-1], [-1,-1,1]], dtype=float)/np.sqrt(3)
+r = np.array([0.2, -0.3, 0.4])
+p = (1 + tetrahedron @ r)/4
+assert np.all(p >= 0) and np.allclose(p.sum(), 1)
+assert np.allclose(3*p @ tetrahedron, r)
+# Analytic amplitude damping from an initially excited atom.
+gamma, t = 0.7, 1.2
+excited = np.exp(-gamma*t)
+rho = np.diag([1-excited, excited])  # ordered |g>, |e>
+assert np.allclose(np.trace(rho), 1)
+assert np.linalg.eigvalsh(rho).min() >= 0
+purity = np.trace(rho @ rho)
+invalid_r = 3*tetrahedron[0]
+invalid_eigenvalues = (1 + np.array([-1, 1])*np.linalg.norm(invalid_r))/2
+assert invalid_eigenvalues.min() < 0
+print(f"Damped excited population: {excited:.8f}; purity: {purity:.8f}")
+print("A normalized POVM probability vector can reconstruct eigenvalues:",
+      invalid_eigenvalues)
+```
+
+For many-body product POVMs, an autoregressive model can compress the joint outcome distribution and produce direct samples. Mapping quantum evolution into this probability representation leads to a linear evolution operator, but its entries need not form a classical Markov generator with nonnegative transition rates. Quantum coherence has not disappeared. Positivity of reconstructed states, statistical conditioning of the inverse, and errors in observables must remain part of validation.
+
+## Research bridge and open problems {#sec-quantum-fermion-mixed-research}
+
+Neural electronic-structure methods show how exact exchange structure and learned correlation can cooperate [@q-pfau2020; @q-hermann2020]. The [FermiNet repository](https://github.com/google-deepmind/ferminet) and [DeepQMC repository](https://github.com/deepqmc/deepqmc) provide implementations for further study; use their versioned documentation and retain their license notices if reusing code. Neural backflow offers related flexibility for lattice fermions [@q-luo2019]. More recent transformer-based Hubbard calculations report competitive finite-system energies and competing-order evidence [@q-gu2025]. These are numerical results in specified models. Establishing superconducting long-range order requires correlation functions, size scaling, and checks against competing states, beyond a single variational energy.
+
+Neural tomography learns representations from experimental measurement distributions [@q-torlai2018]. For open-system dynamics, Luo and collaborators use autoregressive transformer models in an informationally complete probability representation [@q-luo2022], while Reh and collaborators use a variational dynamical formulation for mixed states [@q-reh2021]. These approaches address different tradeoffs between sampling, physical constraints, and evolution. A direct probability model is convenient to normalize; a purification guarantees positivity but can make some contractions expensive. No one representation dominates every observable and dissipative regime.
+
+Gauge-field–fermion systems add local constraints such as Gauss's law. Neural flow amplitudes and fermionic backflow have been combined in a finite-density lattice gauge-theory study [@q-chenluo2022]. This is a useful example of composing representations around physical structure rather than choosing one generic network for everything. The cited work is a preprint in our verified record, and its model-specific findings should be read as such.
+
+The broad frontier includes robust excited-state calculations, transfer across nuclear geometries and system sizes, better phase and nodal optimization, and mixed-state inference under imperfect measurements. A promising independent question is which constraints should be exact in the architecture and which are best checked afterward. Exact exchange statistics and positivity have clear physical value, but adding every constraint can make sampling or optimization harder. The correct balance is determined by the scientific question and a transparent error budget.
+
+## Exercises and selected solutions {#sec-quantum-fermion-mixed-exercises}
+
+1. Verify the two-fermion oscillator wavefunction's exchange sign and normalization. Explain why a positive Jastrow factor preserves its coincidence node.
+2. In a three-orbital ordered basis, evaluate $c_1^\dagger c_3|0,1,1\rangle$ with the stated creation-operator convention. Track every parity factor.
+3. Derive the electron–nucleus cusp by collecting the $1/r$ terms in the local energy. State why the derivation needs modification if the amplitude vanishes at the nucleus.
+4. Show that a rank-$r$ purification cannot represent a density matrix with more than $r$ nonzero eigenvalues. What auxiliary dimension is needed for a generic full-rank $N$-spin state?
+5. Starting from $|+x\rangle$, apply the analytic amplitude-damping formulas. Verify trace and positivity and calculate the time-dependent Bloch vector.
+6. Use finite counts from the tetrahedral POVM to reconstruct a qubit by direct inversion. Can sampling noise place it outside the Bloch ball? Explain how positivity-constrained likelihood changes the inference.
+
+::: {.callout-tip title="Worked solutions"}
+For exercise 2, annihilating orbital 3 crosses the occupied orbital 2, producing $-|0,1,0\rangle$. Creating in orbital 1 crosses no earlier orbitals, yielding $-|1,1,0\rangle$. The intermediate configuration matters when applying the second operator.
+
+For exercise 4, $\rho=AA^\dagger$ with $A$ having $r$ columns has image contained in the column space of $A$, whose dimension is at most $r$. A generic full-rank $N$-spin state has rank $2^N$, requiring at least that many auxiliary basis states, or $N$ auxiliary qubits. A compact neural purification can still describe special such states without storing the full matrix, but not by assuming a smaller exact rank.
+
+For exercise 5, in basis $(|g\rangle,|e\rangle)$ the initial populations and coherence are all $1/2$. At time $t$, $\rho_{ee}=e^{-\gamma t}/2$, $\rho_{gg}=1-e^{-\gamma t}/2$, and $\rho_{ge}=e^{-\gamma t/2}/2$. Thus $\mathbf r=(e^{-\gamma t/2},0,1-e^{-\gamma t})$ with $\sigma^z=\operatorname{diag}(1,-1)$. Its squared length is $1-e^{-\gamma t}+e^{-2\gamma t}\leq1$, proving positivity for $t\geq0$.
+:::

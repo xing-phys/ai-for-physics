@@ -1,0 +1,47 @@
+# Notation and mathematical reference {#sec-notation}
+
+## Objects, units, and conventions
+
+The same letter can have different conventional meanings in different physical subjects. Each chapter defines its local usage. This table records the recurring conventions rather than imposing a single meaning everywhere.
+
+| Symbol | Typical meaning | Convention |
+|---|---|---|
+| $x,y$ | input, observation, or configuration | Scalar or vector specified locally |
+| $\theta$ | adjustable learned parameters | Real unless explicitly stated otherwise |
+| $\vartheta$ | physical parameters in an inverse problem | Used to distinguish them from network weights |
+| $N,n$ | number of samples or system size | Defined at each use |
+| $P$ | parameter count or a projection | Context specifies |
+| $p(x)$ | probability mass or density | Nonnegative and normalized |
+| $p(y\mid x)$ | conditional distribution | Conditioning variables fixed |
+| $\mathbb E_p[f]$, $\langle f\rangle_p$ | expectation | Integral or sum under $p$ |
+| $C$, $\Sigma$ | covariance matrices | Positive semidefinite |
+| $L$ or $\mathcal L$ | loss, system length, or generator | Defined locally; a Lindblad generator is not a training loss |
+| $\eta$ | optimization step size | Positive for descent with the stated sign |
+| $\beta$ | inverse temperature or momentum coefficient | $\beta=1/(k_BT)$ in statistical mechanics |
+| $H$ | Hamiltonian or Hessian | The chapter makes the distinction explicit |
+| $\psi_\theta(s)$ | quantum-state amplitude | Usually unnormalized until stated |
+| $\rho$ | density operator or correlation coefficient | Defined locally |
+| $O_a$ | logarithmic wavefunction derivative | $\partial_{\theta_a}\log\psi$ in VMC |
+| $S$ | state metric/covariance or action | Definition supplied in the relevant derivation |
+
+Unless units are restored explicitly, small numerical demonstrations use dimensionless variables. Setting $\hbar=1$ means measuring energy and time in compatible units, for example $E_0$ and $\hbar/E_0$. Setting $k_B=1$ measures temperature in energy units. A dimensionless algorithm must still preserve the physical conversion when compared with an experiment.
+
+## Linear algebra reminders
+
+$A^T$ is transpose; $A^*$ complex conjugation; $A^\dagger=(A^*)^T$ conjugate transpose. For complex vectors, $\langle u,v\rangle=u^\dagger v$. $\operatorname{Tr}A=\sum_iA_{ii}$, and for compatible finite matrices $\operatorname{Tr}(AB)=\operatorname{Tr}(BA)$. To verify the latter, expand both as $\sum_{ij}A_{ij}B_{ji}$ and exchange dummy indices. A Hermitian matrix has real eigenvalues; a positive semidefinite one has nonnegative eigenvalues.
+
+The tensor product combines independent vector spaces. If $a$ has components $a_i$ and $b$ has components $b_j$, $(a\otimes b)_{ij}=a_ib_j$. The product space has dimension $d_ad_b$. For operators, $(A\otimes B)(a\otimes b)=(Aa)\otimes(Bb)$. It is not an ordinary dot product and does not sum away either subsystem index.
+
+The pseudoinverse $X^+$ inverts nonzero singular values in the singular-value decomposition and sets inverse zero singular values to zero. It yields the minimum-Euclidean-norm least-squares solution. A cutoff in a numerical pseudoinverse is an additional regularization choice, so it should be reported when small singular values matter.
+
+## Calculus and probability reminders
+
+For a real scalar function $f$ of a vector $x$, $\nabla f$ is the column of first derivatives and $H_f$ its matrix of second derivatives. The Jacobian of vector $F$ is $(J_F)_{ij}=\partial F_i/\partial x_j$. The divergence is $\nabla\cdot F=\sum_i\partial_iF_i$ and the Laplacian is $\nabla^2f=\sum_i\partial_i^2f$. These definitions determine all signs and contractions in the later diffusion and kinetic-energy formulas.
+
+A Gaussian $\mathcal N(\mu,C)$ has mean $\mu$ and covariance $C$. Independent Gaussian variables add means and covariances when added linearly. For any matrix $A$, $\operatorname{Cov}(AX)=A\operatorname{Cov}(X)A^T$, obtained by substituting $AX-A\mu=A(X-\mu)$ inside the covariance definition. This identity underlies linear inference and Gaussian-process conditioning.
+
+The notation $O(h^r)$ means a magnitude bounded by a constant times $|h|^r$ in the specified limit, with other quantities held appropriately fixed. $a\propto b$ means equality up to a factor independent of the variable under discussion. $a\simeq b$ denotes an explicitly described approximation, not an identity.
+
+## Symbols versus guarantees
+
+An expectation value denotes an exact mathematical quantity unless a hat or surrounding text indicates an estimate. A hatted parameter is inferred; it is not automatically unbiased. A normalized wavefunction defines a legitimate state, but its numerical sampler may still fail to explore it. A covariance-based error bar assumes the relevant second moments exist. Every computational guarantee in the book is conditional on the assumptions stated with its derivation.

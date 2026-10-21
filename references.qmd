@@ -1,0 +1,6 @@
+# References {.unnumbered}
+
+The bibliography contains the original papers, reviews, textbooks, and implementation references used throughout this book. Citations in chapters explain the role of each reference rather than assigning a reading prerequisite. Follow the DOI or arXiv links for the original records. Frontier claims are dated and qualified in the relevant chapters.
+
+::: {#refs}
+:::

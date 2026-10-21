@@ -1,0 +1,158 @@
+[
+  {
+    "page": "01-physical-questions.html",
+    "math_expressions": 38,
+    "figures": 1,
+    "status": "passed"
+  },
+  {
+    "page": "02-mathematical-language.html",
+    "math_expressions": 155,
+    "figures": 0,
+    "status": "passed"
+  },
+  {
+    "page": "03-learning-from-data.html",
+    "math_expressions": 104,
+    "figures": 1,
+    "status": "passed"
+  },
+  {
+    "page": "04-neural-networks.html",
+    "math_expressions": 72,
+    "figures": 1,
+    "status": "passed"
+  },
+  {
+    "page": "05-optimization-and-autodiff.html",
+    "math_expressions": 92,
+    "figures": 1,
+    "status": "passed"
+  },
+  {
+    "page": "06-validation-and-uncertainty.html",
+    "math_expressions": 47,
+    "figures": 1,
+    "status": "passed"
+  },
+  {
+    "page": "07-quantum-foundations.html",
+    "math_expressions": 138,
+    "figures": 1,
+    "status": "passed"
+  },
+  {
+    "page": "08-neural-quantum-states.html",
+    "math_expressions": 92,
+    "figures": 0,
+    "status": "passed"
+  },
+  {
+    "page": "09-variational-monte-carlo.html",
+    "math_expressions": 141,
+    "figures": 1,
+    "status": "passed"
+  },
+  {
+    "page": "10-quantum-dynamics.html",
+    "math_expressions": 83,
+    "figures": 1,
+    "status": "passed"
+  },
+  {
+    "page": "11-fermions-and-mixed-states.html",
+    "math_expressions": 163,
+    "figures": 0,
+    "status": "passed"
+  },
+  {
+    "page": "12-generative-statistical-physics.html",
+    "math_expressions": 157,
+    "figures": 1,
+    "status": "passed"
+  },
+  {
+    "page": "13-symmetry-and-graphs.html",
+    "math_expressions": 93,
+    "figures": 0,
+    "status": "passed"
+  },
+  {
+    "page": "14-neural-operators.html",
+    "math_expressions": 106,
+    "figures": 1,
+    "status": "passed"
+  },
+  {
+    "page": "15-physics-informed-learning.html",
+    "math_expressions": 102,
+    "figures": 1,
+    "status": "passed"
+  },
+  {
+    "page": "16-differentiable-simulation.html",
+    "math_expressions": 109,
+    "figures": 1,
+    "status": "passed"
+  },
+  {
+    "page": "17-inverse-problems.html",
+    "math_expressions": 164,
+    "figures": 1,
+    "status": "passed"
+  },
+  {
+    "page": "18-experiment-design.html",
+    "math_expressions": 123,
+    "figures": 1,
+    "status": "passed"
+  },
+  {
+    "page": "19-discovery-and-symbolic.html",
+    "math_expressions": 79,
+    "figures": 1,
+    "status": "passed"
+  },
+  {
+    "page": "20-frontiers-and-research.html",
+    "math_expressions": 40,
+    "figures": 0,
+    "status": "passed"
+  },
+  {
+    "page": "21-projects-and-solutions.html",
+    "math_expressions": 95,
+    "figures": 0,
+    "status": "passed"
+  },
+  {
+    "page": "computational-labs.html",
+    "math_expressions": 2,
+    "figures": 0,
+    "status": "passed"
+  },
+  {
+    "page": "index.html",
+    "math_expressions": 0,
+    "figures": 2,
+    "status": "passed"
+  },
+  {
+    "page": "literature-and-reproducibility.html",
+    "math_expressions": 0,
+    "figures": 0,
+    "status": "passed"
+  },
+  {
+    "page": "notation.html",
+    "math_expressions": 60,
+    "figures": 0,
+    "status": "passed"
+  },
+  {
+    "page": "references.html",
+    "math_expressions": 0,
+    "figures": 0,
+    "status": "passed"
+  }
+]

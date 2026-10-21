@@ -1,0 +1,128 @@
+[
+  {
+    "notebook": "01-physical-questions.ipynb",
+    "code_cells": 1,
+    "seconds": 0.52,
+    "status": "passed"
+  },
+  {
+    "notebook": "02-mathematical-language.ipynb",
+    "code_cells": 1,
+    "seconds": 0.53,
+    "status": "passed"
+  },
+  {
+    "notebook": "03-learning-from-data.ipynb",
+    "code_cells": 2,
+    "seconds": 0.79,
+    "status": "passed"
+  },
+  {
+    "notebook": "04-neural-networks.ipynb",
+    "code_cells": 1,
+    "seconds": 0.81,
+    "status": "passed"
+  },
+  {
+    "notebook": "05-optimization-and-autodiff.ipynb",
+    "code_cells": 1,
+    "seconds": 1.52,
+    "status": "passed"
+  },
+  {
+    "notebook": "06-validation-and-uncertainty.ipynb",
+    "code_cells": 1,
+    "seconds": 0.86,
+    "status": "passed"
+  },
+  {
+    "notebook": "07-quantum-foundations.ipynb",
+    "code_cells": 2,
+    "seconds": 1.0,
+    "status": "passed"
+  },
+  {
+    "notebook": "08-neural-quantum-states.ipynb",
+    "code_cells": 1,
+    "seconds": 0.56,
+    "status": "passed"
+  },
+  {
+    "notebook": "09-variational-monte-carlo.ipynb",
+    "code_cells": 2,
+    "seconds": 1.09,
+    "status": "passed"
+  },
+  {
+    "notebook": "10-quantum-dynamics.ipynb",
+    "code_cells": 1,
+    "seconds": 0.77,
+    "status": "passed"
+  },
+  {
+    "notebook": "11-fermions-and-mixed-states.ipynb",
+    "code_cells": 1,
+    "seconds": 0.55,
+    "status": "passed"
+  },
+  {
+    "notebook": "12-generative-statistical-physics.ipynb",
+    "code_cells": 2,
+    "seconds": 0.82,
+    "status": "passed"
+  },
+  {
+    "notebook": "13-symmetry-and-graphs.ipynb",
+    "code_cells": 1,
+    "seconds": 0.54,
+    "status": "passed"
+  },
+  {
+    "notebook": "14-neural-operators.ipynb",
+    "code_cells": 1,
+    "seconds": 4.02,
+    "status": "passed"
+  },
+  {
+    "notebook": "15-physics-informed-learning.ipynb",
+    "code_cells": 1,
+    "seconds": 4.02,
+    "status": "passed"
+  },
+  {
+    "notebook": "16-differentiable-simulation.ipynb",
+    "code_cells": 2,
+    "seconds": 1.15,
+    "status": "passed"
+  },
+  {
+    "notebook": "17-inverse-problems.ipynb",
+    "code_cells": 3,
+    "seconds": 1.16,
+    "status": "passed"
+  },
+  {
+    "notebook": "18-experiment-design.ipynb",
+    "code_cells": 1,
+    "seconds": 0.79,
+    "status": "passed"
+  },
+  {
+    "notebook": "19-discovery-and-symbolic.ipynb",
+    "code_cells": 1,
+    "seconds": 4.02,
+    "status": "passed"
+  },
+  {
+    "notebook": "20-frontiers-and-research.ipynb",
+    "code_cells": 1,
+    "seconds": 0.66,
+    "status": "passed"
+  },
+  {
+    "notebook": "21-projects-and-solutions.ipynb",
+    "code_cells": 2,
+    "seconds": 0.63,
+    "status": "passed"
+  }
+]

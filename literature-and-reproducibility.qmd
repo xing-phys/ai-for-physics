@@ -1,0 +1,29 @@
+# Literature, scope, and reproducibility {#sec-literature}
+
+## How the research bridges were selected
+
+The curriculum is organized around physical questions and mathematical frameworks. It combines original papers that introduced representative methods, reviews that place those methods in context, textbooks for established background, and open-source implementations that readers can inspect. Scientific importance, pedagogical fit, and conceptual connections determine the selection. No author or institution sets the chapter structure.
+
+The literature search checked primary publisher or arXiv records, including foundational work and relevant developments through 21 October 2026. The source-audit files record links, publication-status caveats, and the role of each group of references: [foundations](research/foundations-sources.md), [quantum methods](research/quantum-sources.md), [physical models](research/physical-models-sources.md), and [inference and discovery](research/discovery-sources.md). Google Scholar access can be rate limited; primary records, rather than a profile's availability, determine citation verification.
+
+Research involving Di Luo and collaborators is included where its content fits the scientific discussion, alongside competing and complementary work worldwide. The same rule applies to every group: a result earns coverage because it illuminates the question, not because of affiliation or citation count. This book does not claim an exhaustive ranking of contributions.
+
+## Reading a paper critically
+
+First identify the physical object: a distribution, state, observable, field, policy, or hypothesis. Then identify what is learned and what is supplied exactly. Check the information available at training time, the objective, the assumed symmetries, the computational budget, and the independent validation. Ask whether a claimed advantage persists when the baseline is tuned and when data-generation costs are included.
+
+Keep expressivity, trainability, generalization, and sampling separate. If a paper proves a representation theorem, locate the assumptions and its complexity dependence. If it presents numerical evidence, locate the systems tested and the uncertainty. If it proposes a future capability, treat it as a research direction. A beautiful demonstration can be valuable without settling a general complexity question.
+
+The research bridges paraphrase methods and conclusions in their scientific context. The mathematical developments and textbook figures are original pedagogical constructions. No copyrighted publisher figures, extensive passages, or research code have been copied. External software and data remain subject to their own licenses; a link is not a license to redistribute them.
+
+## Software and licensing
+
+The teaching code is MIT licensed and the prose and original figures are CC BY 4.0. These licenses cover this repository's original material. References, linked source repositories, model weights, and external datasets are separate works. Check the exact version's license and citation instructions before incorporating them into another project, especially when code, data, and weights have different terms.
+
+The source repository includes an automated Pages workflow that installs the recorded environment, exports and executes notebooks, renders HTML and PDF, checks local links and citations, and deploys the resulting site. A build proves that the specified examples run; it does not reproduce every large-scale calculation in cited papers. Those computations may require specialized hardware, data access, or additional software.
+
+## Boundaries of this edition
+
+The sustained focus is classical AI methods applied to physical systems, especially quantum many-body physics. Quantum hardware used as a machine-learning accelerator is a neighboring topic, not the main curriculum. Detailed detector reconstruction, electronic-structure chemistry, gauge-field algorithms, plasma control, and Earth-system models are represented by examples and research bridges rather than full specialist courses. Their specialized ingredients are explained at the level used here.
+
+The book equips readers with transferable derivations, diagnostic tools, and research projects. No finite textbook removes the need to examine new assumptions when entering an unfamiliar physical domain. When a frontier result depends on additional physical modeling, the relevant chapter identifies that dependence rather than presenting the result as an unconditional capability.
